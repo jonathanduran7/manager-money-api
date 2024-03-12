@@ -1,5 +1,6 @@
 package com.managermoneyapi.services;
 
+import com.managermoneyapi.dto.CreateAccountDto;
 import com.managermoneyapi.entity.Account;
 
 import java.util.List;
@@ -9,7 +10,7 @@ public interface AccountService {
 
     Account findById(Long id);
 
-    Account save(Account account);
+    Account save(CreateAccountDto accountDto);
 
-    Account update(Long id, Account account);
+    Account update(Long id, CreateAccountDto accountDto);
 }
