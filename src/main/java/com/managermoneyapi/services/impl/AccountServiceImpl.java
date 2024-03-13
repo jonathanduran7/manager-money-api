@@ -8,6 +8,7 @@ import org.hibernate.type.descriptor.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,10 +29,10 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account save(CreateAccountDto accountDto) {
-        Account newAccount = new Account()
+        Account newAccount = Account
                 .builder()
                 .name(accountDto.getName())
-                .created_at(LocalDateTime.now().toString())
+                .created_at(LocalDate.now().toString())
                 .build();
         return accountRepository.save(newAccount);
     }
