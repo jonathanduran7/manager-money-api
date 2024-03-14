@@ -1,11 +1,13 @@
 package com.managermoneyapi.services.impl;
 
+import com.managermoneyapi.dto.CategoryDto;
 import com.managermoneyapi.entity.Category;
 import com.managermoneyapi.repositories.CategoryRepository;
 import com.managermoneyapi.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,17 +27,24 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category save(Category category) {
-        return categoryRepository.save(category);
+    public Category save(CategoryDto categoryDto) {
+        Category categorySave = Category
+                .builder()
+                .name(categoryDto.getName())
+                .created_at(LocalDate.now().toString())
+                .updated_at(LocalDate.now().toString())
+                .build();
+
+        return categoryRepository.save(categorySave);
     }
 
     @Override
-    public Optional<Category> update(Long id, Category category) {
+    public Optional<Category> update(Long id, CategoryDto categoryDto) {
 
         Category categoryToUpdate = categoryRepository.findById(id).orElse(null);
 
         if (categoryToUpdate != null) {
-            categoryToUpdate.setName(category.getName());
+            categoryToUpdate.setName(categoryDto.getName());
             return Optional.of(categoryRepository.save(categoryToUpdate));
         }
 
