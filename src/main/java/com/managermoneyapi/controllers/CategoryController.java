@@ -15,33 +15,5 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/categories")
 @Validated
-public class CategoryController {
-
-    @Autowired
-    private CategoryService categoryService;
-
-    @GetMapping
-    @ResponseBody
-    public List<Category> findAll() {
-        return categoryService.findAll();
-    }
-
-    @GetMapping("/{id}")
-    @ResponseBody
-    public Optional<Category> findById(@PathVariable Long id) {
-        return categoryService.findById(id);
-    }
-
-    @PostMapping
-    @ResponseBody
-    public Category save(@RequestBody @Valid CategoryDto categoryDto) {
-        return categoryService.save(categoryDto);
-    }
-
-    @PutMapping("/{id}")
-    @ResponseBody
-    public Optional<Category> update(@PathVariable Long id, @RequestBody @Valid CategoryDto categoryDto) {
-        return categoryService.update(id, categoryDto);
-    }
-
+public class CategoryController extends BaseController<Category, CategoryDto, CategoryService>{
 }
