@@ -30,8 +30,8 @@ public class AccountController {
     @GetMapping("/{id}")
     @ResponseBody
     public ResponseEntity<?> show(@PathVariable Long id) {
-        Account account = accountService.findById(id);
-        if (account != null) {
+        Account account = accountService.findById(id).get();
+        if (account.getId() != null) {
             return ResponseEntity.ok(account);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found");
@@ -47,8 +47,8 @@ public class AccountController {
     @PutMapping("/{id}")
     @ResponseBody
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody @Valid CreateAccountDto accountDto) {
-        Account account = accountService.update(id, accountDto);
-        if(account == null) {
+        Account account = accountService.update(id, accountDto).get();
+        if(account.getId() == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found");
         }
         return ResponseEntity.ok(account);
