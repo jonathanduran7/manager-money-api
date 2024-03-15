@@ -41,18 +41,14 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Optional<Category> update(Long id, CategoryDto categoryDto) {
 
-        Category categoryToUpdate = categoryRepository.findById(id).orElse(null);
+        Optional<Category> categoryOptional = categoryRepository.findById(id);
 
-        if (categoryToUpdate != null) {
+        if (categoryOptional.isPresent()){
+            Category categoryToUpdate = categoryOptional.get();
             categoryToUpdate.setName(categoryDto.getName());
             return Optional.of(categoryRepository.save(categoryToUpdate));
         }
 
         return Optional.empty();
-    }
-
-    @Override
-    public void delete(Long id) {
-        categoryRepository.deleteById(id);
     }
 }
