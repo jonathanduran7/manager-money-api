@@ -58,7 +58,7 @@ class AccountServiceTest {
                 .name("Account Test Update")
                 .build();
 
-        Account accountUpdateService = accountService.update(1L, createAccountDto);
+        Account accountUpdateService = accountService.update(1L, createAccountDto).get();
 
         assertEquals(accountUpdateService.getName(), "Account Test Update");
     }
@@ -74,7 +74,7 @@ class AccountServiceTest {
 
         Mockito.when(accountRepository.findById(1L)).thenReturn(java.util.Optional.of(account));
 
-        Account accountServiceById = accountService.findById(1L);
+        Account accountServiceById = accountService.findById(1L).get();
 
         assertEquals(accountServiceById.getName(), "Account Test");
     }
