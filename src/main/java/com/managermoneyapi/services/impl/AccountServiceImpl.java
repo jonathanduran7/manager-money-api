@@ -40,13 +40,14 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Optional<Account> update(Long id, CreateAccountDto accountDto) {
-        Account accountToUpdate = accountRepository.findById(id).get();
+        Optional<Account> accountOptional = accountRepository.findById(id);
 
-        if (accountToUpdate.getId() != null) {
+        if (accountOptional.isPresent()) {
+            Account accountToUpdate = accountOptional.get();
             accountToUpdate.setName(accountDto.getName());
             return Optional.of(accountRepository.save(accountToUpdate));
         }
 
-        return null;
+        return Optional.empty();
     }
 }
