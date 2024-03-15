@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -23,8 +24,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account findById(Long id) {
-        return accountRepository.findById(id).orElse(null);
+    public Optional<Account> findById(Long id) {
+        return accountRepository.findById(id);
     }
 
     @Override
@@ -38,12 +39,12 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account update(Long id, CreateAccountDto accountDto) {
-        Account accountToUpdate = accountRepository.findById(id).orElse(null);
+    public Optional<Account> update(Long id, CreateAccountDto accountDto) {
+        Account accountToUpdate = accountRepository.findById(id).get();
 
-        if (accountToUpdate != null) {
+        if (accountToUpdate.getId() != null) {
             accountToUpdate.setName(accountDto.getName());
-            return accountRepository.save(accountToUpdate);
+            return Optional.of(accountRepository.save(accountToUpdate));
         }
 
         return null;
