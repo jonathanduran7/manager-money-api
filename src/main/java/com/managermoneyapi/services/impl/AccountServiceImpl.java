@@ -2,12 +2,15 @@ package com.managermoneyapi.services.impl;
 
 import com.managermoneyapi.dto.CreateAccountDto;
 import com.managermoneyapi.entity.Account;
+import com.managermoneyapi.entity.AccountBalance;
+import com.managermoneyapi.repositories.AccountBalanceRepository;
 import com.managermoneyapi.repositories.AccountRepository;
 import com.managermoneyapi.services.AccountService;
 import org.hibernate.type.descriptor.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +20,9 @@ import java.util.Optional;
 public class AccountServiceImpl implements AccountService {
     @Autowired
     AccountRepository accountRepository;
+
+    @Autowired
+    AccountBalanceRepository accountBalanceRepository;
 
     @Override
     public List<Account> findAll() {
@@ -35,7 +41,17 @@ public class AccountServiceImpl implements AccountService {
                 .name(accountDto.getName())
                 .created_at(LocalDate.now().toString())
                 .build();
-        return accountRepository.save(newAccount);
+        Account accountSaved = accountRepository.save(newAccount);
+
+        AccountBalance accountBalance = AccountBalance
+                .builder()
+                .account(accountSaved)
+                .balance(BigDecimal.ZERO)
+                .build();
+
+        accountBalanceRepository.save(accountBalance);
+
+        return accountSaved;
     }
 
     @Override
