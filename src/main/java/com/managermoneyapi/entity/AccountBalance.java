@@ -1,5 +1,6 @@
 package com.managermoneyapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,5 +25,6 @@ public class AccountBalance {
 
     @OneToOne
     @JoinColumn(name = "account_id", referencedColumnName = "id")
+    @JsonIgnore
     private Account account;
 }

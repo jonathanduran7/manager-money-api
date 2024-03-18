@@ -21,4 +21,8 @@ public class Account {
 
     @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private String created_at;
+
+    @OneToOne(mappedBy = "account")
+    @JoinColumn(name = "id", referencedColumnName = "account_id")
+    private AccountBalance accountBalance;
 }
