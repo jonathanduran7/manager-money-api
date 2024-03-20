@@ -1,8 +1,8 @@
 package com.managermoneyapi.services.impl;
 
 import com.managermoneyapi.dto.TransactionDto;
-import com.managermoneyapi.entity.Transaction;
-import com.managermoneyapi.repositories.TransactionRepository;
+import com.managermoneyapi.entity.*;
+import com.managermoneyapi.repositories.*;
 import com.managermoneyapi.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +16,14 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     TransactionRepository transactionRepository;
+    @Autowired
+    CategoryRepository categoryRepository;
+    @Autowired
+    AccountRepository accountRepository;
+    @Autowired
+    TransactionDetailRepository transactionDetailRepository;
+    @Autowired
+    TransferRepository transferRepository;
 
     @Override
     public List<Transaction> findAll() {
@@ -34,9 +42,48 @@ public class TransactionServiceImpl implements TransactionService {
                 .title(transactionDto.getTitle())
                 .description(transactionDto.getDescription())
                 .type_transaction(transactionDto.getType_transaction().name())
+                .amount(transactionDto.getAmount())
                 .created_at(LocalDate.now().toString())
                 .build();
-        return transactionRepository.save(transaction);
+        Transaction transactionSaved = transactionRepository.save(transaction);
+
+       if(transactionDto.getType_transaction().name().equals("TRANSACTION")){
+           System.out.println("TRANSACTION");
+            Optional<Account> account = accountRepository.findById(transactionDto.getAccount_id());
+            Optional<Category> category = categoryRepository.findById(transactionDto.getCategory_id());
+
+            if(account.isPresent() && category.isPresent()){
+                TransactionDetail detail = TransactionDetail
+                        .builder()
+                        .transaction(transactionSaved)
+                        .account(account.get())
+                        .category(category.get())
+                        .amount(transactionDto.getAmount())
+                        .build();
+
+                transactionDetailRepository.save(detail);
+            }
+        }
+
+        if(transactionDto.getType_transaction().name().equals("TRANSFER")) {
+            System.out.println("TRANSFER");
+            Optional<Account> accountOrigin = accountRepository.findById(transactionDto.getAccount_origin_id());
+            Optional<Account> accountDestination = accountRepository.findById(transactionDto.getAccount_destination_id());
+
+            if(accountOrigin.isPresent() && accountDestination.isPresent()){
+                Transfer transfer = Transfer
+                        .builder()
+                        .accountOrigin(accountOrigin.get())
+                        .accountDestination(accountDestination.get())
+                        .transaction(transactionSaved)
+                        .amount(transactionDto.getAmount())
+                        .build();
+
+                transferRepository.save(transfer);
+            }
+        }
+
+        return transactionSaved;
     }
 
     @Override
