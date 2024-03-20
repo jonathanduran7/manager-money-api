@@ -23,10 +23,14 @@ public class Transfer {
     private BigDecimal amount;
 
     @OneToOne
+    @JoinColumn(name = "transaction_id", referencedColumnName = "id")
+    private Transaction transaction;
+
+    @ManyToOne
     @JoinColumn(name = "account_origin", referencedColumnName = "id")
     private Account accountOrigin;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "account_destination", referencedColumnName = "id")
     private Account accountDestination;
 }
