@@ -16,21 +16,21 @@ import java.math.BigDecimal;
 @Builder
 public class TransactionDetail {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "transaction_id", referencedColumnName = "id")
     private Transaction transaction;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "account_id", referencedColumnName = "id")
     private Account account;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
 }
