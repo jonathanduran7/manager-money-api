@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,9 +19,15 @@ public class TransactionDto {
 
     private String description;
 
-    @NotBlank(message = "Type transaction is required")
     private TypeTransaction type_transaction;
 
-    @NotBlank(message = "Amount is required")
-    private Float amount;
+    private BigDecimal amount;
+
+    private Long account_id;
+
+    private Long category_id;
+
+    private Long account_destination_id;
+
+    private Long account_origin_id;
 }
