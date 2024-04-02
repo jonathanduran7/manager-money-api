@@ -19,18 +19,16 @@ public class TransactionDetail {
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "title", nullable = false)
+    private String title;
+
+    @Column(name = "description", nullable = false)
+    private String description;
+
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
-    @ManyToOne
-    @JoinColumn(name = "transaction_id", referencedColumnName = "id")
-    private Transaction transaction;
 
-    @ManyToOne
-    @JoinColumn(name = "account_id", referencedColumnName = "id")
-    private Account account;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "id")
-    private Category category;
+
 }
