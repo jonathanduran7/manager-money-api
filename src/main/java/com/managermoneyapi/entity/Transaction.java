@@ -25,12 +25,17 @@ public class Transaction {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "type_transaction", nullable = false)
-    private String type_transaction;
-
-    @Column(name = "created_at", nullable = false)
-    private String created_at;
-
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
+
+    @ManyToOne
+    @JoinColumn(name = "account_id", referencedColumnName = "id")
+    private Account account;
+
+    @Column(name = "date_time", nullable = false)
+    private String date_time;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", referencedColumnName = "id")
+    private Category category;
 }
