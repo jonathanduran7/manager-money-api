@@ -116,7 +116,20 @@ public class TransactionServiceImpl implements TransactionService {
         Optional<Transaction> transactionOptional = transactionRepository.findById(id);
 
         if (transactionOptional.isPresent()){
+            Transaction transactionToDelete = transactionOptional.get();
+
+            Optional<AccountBalance> accountBalance = accountBalanceRepository.findByAccountId(transactionToDelete.getAccount().getId());
+
+            if(accountBalance.isPresent()) {
+                BigDecimal currentBalance = accountBalance.get().getBalance();
+                BigDecimal newBalance = currentBalance.subtract(transactionToDelete.getAmount());
+                accountBalance.get().setBalance(newBalance);
+                accountBalanceRepository.save(accountBalance.get());
+            }
+
             transactionRepository.delete(transactionOptional.get());
+        } else {
+            throw new IllegalStateException("Transacción no encontrada");
         }
     }
 }
