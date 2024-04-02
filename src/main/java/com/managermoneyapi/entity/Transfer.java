@@ -22,10 +22,6 @@ public class Transfer {
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
-    @OneToOne
-    @JoinColumn(name = "transaction_id", referencedColumnName = "id")
-    private Transaction transaction;
-
     @ManyToOne
     @JoinColumn(name = "account_origin", referencedColumnName = "id")
     private Account accountOrigin;
@@ -33,4 +29,7 @@ public class Transfer {
     @ManyToOne
     @JoinColumn(name = "account_destination", referencedColumnName = "id")
     private Account accountDestination;
+
+    @Column(name = "date_time", nullable = false)
+    private String date_time;
 }
