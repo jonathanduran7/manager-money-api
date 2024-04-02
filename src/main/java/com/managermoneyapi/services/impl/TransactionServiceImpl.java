@@ -30,10 +30,7 @@ public class TransactionServiceImpl implements TransactionService {
     AccountBalanceRepository accountBalanceRepository;
 
     @Override
-    public List<Transaction> findAll() {return transactionRepository.findAll();}
-
-    @Override
-    public List<TransactionResponseDto> findAllMapper() {
+    public List<TransactionResponseDto> findAll() {
         return transactionRepository.findAll()
                 .stream()
                 .map(TransactionResponseMapper::toDTO)
@@ -41,13 +38,15 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Optional<Transaction> findById(Long id) {
-        return transactionRepository.findById(id);
+    public Optional<TransactionResponseDto> findById(Long id) {
+
+        return transactionRepository.findById(id)
+                .map(TransactionResponseMapper::toDTO);
     }
 
     @Override
     @Transactional
-    public Transaction save(TransactionDto transactionDto) {
+    public TransactionResponseDto save(TransactionDto transactionDto) {
 
         Optional<Account> account = accountRepository.findById(transactionDto.getAccount_id());
         Optional<Category> category = categoryRepository.findById(transactionDto.getCategory_id());
@@ -81,14 +80,14 @@ public class TransactionServiceImpl implements TransactionService {
                     throw new IllegalStateException("Saldo insuficiente para realizar la transacción");
                 }
             }
-            return transactionSaved;
+            return TransactionResponseMapper.toDTO(transactionSaved);
         }
         return null;
     }
 
     @Override
     @Transactional
-    public Optional<Transaction> update(Long id, TransactionDto transactionDto) {
+    public Optional<TransactionResponseDto> update(Long id, TransactionDto transactionDto) {
         Optional<Transaction> transactionOptional = transactionRepository.findById(id);
 
         if (transactionOptional.isPresent()){
@@ -114,7 +113,9 @@ public class TransactionServiceImpl implements TransactionService {
             transactionToUpdate.setAmount(transactionDto.getAmount());
             transactionToUpdate.setCategory(categoryRepository.findById(transactionDto.getCategory_id()).get());
 
-            return Optional.of(transactionRepository.save(transactionToUpdate));
+            return Optional.of(TransactionResponseMapper.toDTO(
+                    transactionRepository.save(transactionToUpdate)
+            ));
         } else {
             return Optional.empty();
         }
