@@ -4,9 +4,11 @@ import com.managermoneyapi.dto.TransactionDto;
 import com.managermoneyapi.entity.*;
 import com.managermoneyapi.repositories.*;
 import com.managermoneyapi.services.TransactionService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -20,10 +22,9 @@ public class TransactionServiceImpl implements TransactionService {
     CategoryRepository categoryRepository;
     @Autowired
     AccountRepository accountRepository;
+
     @Autowired
-    TransactionDetailRepository transactionDetailRepository;
-    @Autowired
-    TransferRepository transferRepository;
+    AccountBalanceRepository accountBalanceRepository;
 
     @Override
     public List<Transaction> findAll() {
@@ -36,68 +37,58 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional
     public Transaction save(TransactionDto transactionDto) {
-        Transaction transaction = Transaction
-                .builder()
-                .title(transactionDto.getTitle())
-                .description(transactionDto.getDescription())
-                .type_transaction(transactionDto.getType_transaction().name())
-                .amount(transactionDto.getAmount())
-                .created_at(LocalDate.now().toString())
-                .build();
-        Transaction transactionSaved = transactionRepository.save(transaction);
 
-       if(transactionDto.getType_transaction().name().equals("TRANSACTION")){
-           System.out.println("TRANSACTION");
-            Optional<Account> account = accountRepository.findById(transactionDto.getAccount_id());
-            Optional<Category> category = categoryRepository.findById(transactionDto.getCategory_id());
+        Optional<Account> account = accountRepository.findById(transactionDto.getAccount_id());
+        Optional<Category> category = categoryRepository.findById(transactionDto.getCategory_id());
 
-            if(account.isPresent() && category.isPresent()){
-                TransactionDetail detail = TransactionDetail
-                        .builder()
-                        .transaction(transactionSaved)
-                        .account(account.get())
-                        .category(category.get())
-                        .amount(transactionDto.getAmount())
-                        .build();
+        if (account.isPresent() || category.isPresent()){
+            Transaction transaction = Transaction
+                    .builder()
+                    .title(transactionDto.getTitle())
+                    .description(transactionDto.getDescription())
+                    .amount(transactionDto.getAmount())
+                    .date_time(LocalDate.now().toString())
+                    .category(category.get())
+                    .account(account.get())
+                    .build();
 
-                transactionDetailRepository.save(detail);
+            Transaction transactionSaved = transactionRepository.save(transaction);
+
+            Optional<AccountBalance> accountBalance = accountBalanceRepository.findByAccountId(transactionDto.getAccount_id());
+
+            if(accountBalance.isPresent()){
+
+                BigDecimal amount = transactionDto.getAmount();
+                BigDecimal currentBalance = accountBalance.get().getBalance();
+
+                BigDecimal newBalance = currentBalance.add(amount);
+
+                if (newBalance.compareTo(BigDecimal.ZERO) >= 0) {
+                    accountBalance.get().setBalance(newBalance);
+                    accountBalanceRepository.save(accountBalance.get());
+                } else {
+                    throw new IllegalStateException("Saldo insuficiente para realizar la transacción");
+                }
             }
+            return transactionSaved;
         }
-
-        if(transactionDto.getType_transaction().name().equals("TRANSFER")) {
-            System.out.println("TRANSFER");
-            Optional<Account> accountOrigin = accountRepository.findById(transactionDto.getAccount_origin_id());
-            Optional<Account> accountDestination = accountRepository.findById(transactionDto.getAccount_destination_id());
-
-            if(accountOrigin.isPresent() && accountDestination.isPresent()){
-                Transfer transfer = Transfer
-                        .builder()
-                        .accountOrigin(accountOrigin.get())
-                        .accountDestination(accountDestination.get())
-                        .transaction(transactionSaved)
-                        .amount(transactionDto.getAmount())
-                        .build();
-
-                transferRepository.save(transfer);
-            }
-        }
-
-        return transactionSaved;
+        return null;
     }
 
     @Override
     public Optional<Transaction> update(Long id, TransactionDto transactionDto) {
 
-        Optional<Transaction> transactionOptional = transactionRepository.findById(id);
+//        Optional<Transaction> transactionOptional = transactionRepository.findById(id);
 
-        if (transactionOptional.isPresent()){
-            Transaction transactionToUpdate = transactionOptional.get();
-            transactionToUpdate.setTitle(transactionDto.getTitle());
-            transactionToUpdate.setDescription(transactionDto.getDescription());
-            transactionToUpdate.setType_transaction(transactionDto.getType_transaction().name());
-            return Optional.of(transactionRepository.save(transactionToUpdate));
-        }
+//        if (transactionOptional.isPresent()){
+//            Transaction transactionToUpdate = transactionOptional.get();
+//            transactionToUpdate.setTitle(transactionDto.getTitle());
+//            transactionToUpdate.setDescription(transactionDto.getDescription());
+//            transactionToUpdate.setType_transaction(transactionDto.getType_transaction().name());
+//            return Optional.of(transactionRepository.save(transactionToUpdate));
+//        }
 
         return Optional.empty();
     }
