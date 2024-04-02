@@ -6,10 +6,7 @@ import com.managermoneyapi.services.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/transactions")
@@ -22,4 +19,9 @@ public class TransactionController extends BaseController<Transaction, Transacti
         service.delete(id);
     }
 
+    @GetMapping("/mapper")
+    @ResponseBody
+    public ResponseEntity<?> findAllMapper() {
+        return ResponseEntity.ok(service.findAllMapper());
+    }
 }

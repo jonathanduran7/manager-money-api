@@ -1,7 +1,9 @@
 package com.managermoneyapi.services.impl;
 
 import com.managermoneyapi.dto.TransactionDto;
+import com.managermoneyapi.dto.TransactionResponseDto;
 import com.managermoneyapi.entity.*;
+import com.managermoneyapi.mappers.TransactionResponseMapper;
 import com.managermoneyapi.repositories.*;
 import com.managermoneyapi.services.TransactionService;
 import jakarta.transaction.Transactional;
@@ -12,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -27,8 +30,14 @@ public class TransactionServiceImpl implements TransactionService {
     AccountBalanceRepository accountBalanceRepository;
 
     @Override
-    public List<Transaction> findAll() {
-        return transactionRepository.findAll();
+    public List<Transaction> findAll() {return transactionRepository.findAll();}
+
+    @Override
+    public List<TransactionResponseDto> findAllMapper() {
+        return transactionRepository.findAll()
+                .stream()
+                .map(TransactionResponseMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
