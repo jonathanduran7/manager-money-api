@@ -19,15 +19,9 @@ public class TransactionDto {
 
     private String description;
 
-    private TypeTransaction type_transaction;
-
     private BigDecimal amount;
 
     private Long account_id;
 
     private Long category_id;
-
-    private Long account_destination_id;
-
-    private Long account_origin_id;
 }
