@@ -78,19 +78,37 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional
     public Optional<Transaction> update(Long id, TransactionDto transactionDto) {
+        Optional<Transaction> transactionOptional = transactionRepository.findById(id);
 
-//        Optional<Transaction> transactionOptional = transactionRepository.findById(id);
+        if (transactionOptional.isPresent()){
+            Transaction transactionToUpdate = transactionOptional.get();
 
-//        if (transactionOptional.isPresent()){
-//            Transaction transactionToUpdate = transactionOptional.get();
-//            transactionToUpdate.setTitle(transactionDto.getTitle());
-//            transactionToUpdate.setDescription(transactionDto.getDescription());
-//            transactionToUpdate.setType_transaction(transactionDto.getType_transaction().name());
-//            return Optional.of(transactionRepository.save(transactionToUpdate));
-//        }
+            Optional<AccountBalance> accountBalance = accountBalanceRepository.findByAccountId(transactionToUpdate.getAccount().getId());
 
-        return Optional.empty();
+            if(accountBalance.isPresent()) {
+                BigDecimal currentBalance = accountBalance.get().getBalance();
+                BigDecimal newBalance = currentBalance.subtract(transactionToUpdate.getAmount());
+                BigDecimal newBalance2 = newBalance.add(transactionDto.getAmount());
+
+                if (newBalance2.compareTo(BigDecimal.ZERO) >= 0) {
+                    accountBalance.get().setBalance(newBalance2);
+                    accountBalanceRepository.save(accountBalance.get());
+                } else {
+                    throw new IllegalStateException("Saldo insuficiente para realizar la transacción");
+                }
+            }
+
+            transactionToUpdate.setTitle(transactionDto.getTitle());
+            transactionToUpdate.setDescription(transactionDto.getDescription());
+            transactionToUpdate.setAmount(transactionDto.getAmount());
+            transactionToUpdate.setCategory(categoryRepository.findById(transactionDto.getCategory_id()).get());
+
+            return Optional.of(transactionRepository.save(transactionToUpdate));
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override
