@@ -11,8 +11,8 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "transfers")
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class Transfer {
     @Id
